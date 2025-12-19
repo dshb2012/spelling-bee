@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spelling Bee</title>
+<title>Reading Class</title>
 
 <link rel="manifest" href="manifest.json">
 
@@ -21,8 +21,8 @@ body {
   right: 0;
   background: #d32f2f;
   color: white;
-  text-align: center;
   font-size: 18px;
+  text-align: center;
   padding: 10px;
   z-index: 9999;
 }
@@ -39,9 +39,13 @@ button {
   font-size: 14px;
 }
 
+button:disabled {
+  opacity: 0.5;
+}
+
 table {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
 }
 
 td, th {
@@ -65,6 +69,7 @@ tr.active {
   <button onclick="pausePlay()">⏸ Pause</button>
   <button onclick="resumePlay()">▶ Resume</button>
   <button onclick="stopPlay()">⏹ Stop</button>
+
   <input type="number" id="startRow" placeholder="Baris ke..." style="width:90px">
   <button onclick="playFromRow()">🔢 Play dari Baris</button>
 </div>
@@ -72,20 +77,20 @@ tr.active {
 <table id="dataTable"></table>
 
 <script>
-let data = [];
-let currentRow = 0;
-let paused = false;
+let rows = [];
 let stopped = false;
-let voice = new SpeechSynthesisUtterance();
-voice.lang = "en-US";
+let paused = false;
+let isPlaying = false; // kunci spelling saat play all
+
+const GAP = 400;      // 0.4 detik antar kolom
+const ROW_DELAY = 20; // 20 detik antar baris
 
 document.getElementById("fileInput").addEventListener("change", loadCSV);
 
 function loadCSV(e) {
   const reader = new FileReader();
   reader.onload = () => {
-    const lines = reader.result.split("\n");
-    data = lines.map(l => l.split(","));
+    rows = reader.result.trim().split("\n").map(r => r.split(","));
     renderTable();
   };
   reader.readAsText(e.target.files[0]);
@@ -94,19 +99,24 @@ function loadCSV(e) {
 function renderTable() {
   const table = document.getElementById("dataTable");
   table.innerHTML = "";
-  data.forEach((row, i) => {
+
+  rows.forEach((r, i) => {
     const tr = document.createElement("tr");
-    row.slice(0,3).forEach(cell => {
+
+    // tampilkan semua kolom CSV
+    r.forEach(cell => {
       const td = document.createElement("td");
       td.textContent = cell;
       tr.appendChild(td);
     });
 
+    // tombol spelling
     const tdSpell = document.createElement("td");
-    const btnSpell = document.createElement("button");
-    btnSpell.textContent = "🔤 Spelling";
-    btnSpell.onclick = () => spelling(i);
-    tdSpell.appendChild(btnSpell);
+    const btn = document.createElement("button");
+    btn.textContent = "🔤 Spelling";
+    btn.className = "spellBtn";
+    btn.onclick = () => spellingRow(i);
+    tdSpell.appendChild(btn);
     tr.appendChild(tdSpell);
 
     table.appendChild(tr);
@@ -114,21 +124,43 @@ function renderTable() {
 }
 
 async function playAll() {
+  stopPlay();
   stopped = false;
   paused = false;
-  for (let i = currentRow; i < data.length; i++) {
+  isPlaying = true;
+  toggleSpelling(false);
+
+  for (let i = 0; i < rows.length; i++) {
     if (stopped) break;
-    currentRow = i;
     await playRow(i);
   }
+
+  isPlaying = false;
+  toggleSpelling(true);
 }
 
 function playFromRow() {
-  const r = parseInt(document.getElementById("startRow").value) - 1;
-  if (!isNaN(r)) {
-    currentRow = r;
-    playAll();
+  stopPlay();
+  stopped = false;
+  paused = false;
+  isPlaying = true;
+  toggleSpelling(false);
+
+  const start = parseInt(document.getElementById("startRow").value) - 1;
+  if (isNaN(start) || start < 0 || start >= rows.length) {
+    isPlaying = false;
+    toggleSpelling(true);
+    return;
   }
+
+  (async () => {
+    for (let i = start; i < rows.length; i++) {
+      if (stopped) break;
+      await playRow(i);
+    }
+    isPlaying = false;
+    toggleSpelling(true);
+  })();
 }
 
 function pausePlay() {
@@ -143,57 +175,83 @@ function resumePlay() {
 
 function stopPlay() {
   stopped = true;
+  paused = false;
+  isPlaying = false;
   speechSynthesis.cancel();
   document.getElementById("timerBox").textContent = "Timer: -";
+  clearHighlight();
+  toggleSpelling(true);
 }
 
 async function playRow(i) {
   highlightRow(i);
-  await speak(data[i][0]);
-  await wait(400);
-  await speak(data[i][1]);
-  await wait(400);
-  await speak(data[i][2]);
-  await countdown(20);
-}
 
-function spelling(i) {
-  const word = data[i][2];
-  speak(word);
-  wait(300).then(async () => {
-    for (let c of word) {
-      await speak(c);
-      await wait(300);
-    }
-    speak(word);
-  });
+  // Kolom: A=nomor (0) ❌, B=kata (1) ✅, C=kalimat (2) ✅, D=kata (3) ✅
+  await speak(rows[i][1]);
+  await wait(GAP);
+  await speak(rows[i][2]);
+  await wait(GAP);
+  await speak(rows[i][3]);
+
+  await startRowTimer();
 }
 
 function speak(text) {
-  return new Promise(res => {
-    voice.text = text;
-    voice.onend = res;
-    speechSynthesis.speak(voice);
+  return new Promise(resolve => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.onend = resolve;
+    speechSynthesis.speak(u);
   });
 }
 
 function wait(ms) {
-  return new Promise(res => setTimeout(res, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function countdown(sec) {
-  for (let i = sec; i > 0; i--) {
+async function startRowTimer() {
+  for (let i = ROW_DELAY; i > 0; i--) {
+    if (stopped) break;
     document.getElementById("timerBox").textContent = "Next row in " + i + "s";
     await wait(1000);
-    if (stopped) break;
   }
+  document.getElementById("timerBox").textContent = "Timer: -";
 }
 
 function highlightRow(i) {
-  document.querySelectorAll("tr").forEach(tr => tr.classList.remove("active"));
+  clearHighlight();
   document.querySelectorAll("tr")[i]?.classList.add("active");
 }
 
+function clearHighlight() {
+  document.querySelectorAll("tr").forEach(tr => tr.classList.remove("active"));
+}
+
+// 🔤 SPELLING — HANYA JALAN JIKA DIKLIK MANUAL
+async function spellingRow(i) {
+  if (isPlaying) return; // tidak boleh saat play all
+
+  const word = rows[i][3];
+  if (!word) return;
+
+  await speak(word);
+  await wait(300);
+
+  for (let c of word) {
+    await speak(c);
+    await wait(300);
+  }
+
+  await speak(word);
+}
+
+function toggleSpelling(enable) {
+  document.querySelectorAll(".spellBtn").forEach(btn => {
+    btn.disabled = !enable;
+  });
+}
+
+// PWA
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
