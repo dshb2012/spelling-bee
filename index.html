@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reading Class</title>
-
-<link rel="manifest" href="manifest.json">
+<title>Spelling Bee</title>
 
 <style>
 body {
@@ -19,7 +17,7 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  background: #d32f2f;
+  background: #1976d2;
   color: white;
   font-size: 18px;
   text-align: center;
@@ -80,17 +78,21 @@ tr.active {
 let rows = [];
 let stopped = false;
 let paused = false;
-let isPlaying = false; // kunci spelling saat play all
+let playingAll = false;
 
-const GAP = 400;      // 0.4 detik antar kolom
-const ROW_DELAY = 20; // 20 detik antar baris
+const GAP_COL = 500;   // ✅ 0.5 detik antar kolom
+const GAP_SPELL = 400; // 0.4 detik spelling
+const ROW_DELAY = 20;  // 20 detik antar baris
 
 document.getElementById("fileInput").addEventListener("change", loadCSV);
 
 function loadCSV(e) {
   const reader = new FileReader();
   reader.onload = () => {
-    rows = reader.result.trim().split("\n").map(r => r.split(","));
+    rows = reader.result
+      .trim()
+      .split("\n")
+      .map(r => r.split(",").map(c => c.trim()));
     renderTable();
   };
   reader.readAsText(e.target.files[0]);
@@ -103,18 +105,15 @@ function renderTable() {
   rows.forEach((r, i) => {
     const tr = document.createElement("tr");
 
-    // tampilkan semua kolom CSV
     r.forEach(cell => {
       const td = document.createElement("td");
       td.textContent = cell;
       tr.appendChild(td);
     });
 
-    // tombol spelling
     const tdSpell = document.createElement("td");
     const btn = document.createElement("button");
     btn.textContent = "🔤 Spelling";
-    btn.className = "spellBtn";
     btn.onclick = () => spellingRow(i);
     tdSpell.appendChild(btn);
     tr.appendChild(tdSpell);
@@ -123,33 +122,31 @@ function renderTable() {
   });
 }
 
+/* ===================== PLAY ===================== */
+
 async function playAll() {
   stopPlay();
   stopped = false;
   paused = false;
-  isPlaying = true;
-  toggleSpelling(false);
+  playingAll = true;
 
   for (let i = 0; i < rows.length; i++) {
     if (stopped) break;
     await playRow(i);
   }
 
-  isPlaying = false;
-  toggleSpelling(true);
+  playingAll = false;
 }
 
 function playFromRow() {
   stopPlay();
   stopped = false;
   paused = false;
-  isPlaying = true;
-  toggleSpelling(false);
+  playingAll = true;
 
   const start = parseInt(document.getElementById("startRow").value) - 1;
   if (isNaN(start) || start < 0 || start >= rows.length) {
-    isPlaying = false;
-    toggleSpelling(true);
+    playingAll = false;
     return;
   }
 
@@ -158,8 +155,7 @@ function playFromRow() {
       if (stopped) break;
       await playRow(i);
     }
-    isPlaying = false;
-    toggleSpelling(true);
+    playingAll = false;
   })();
 }
 
@@ -176,21 +172,23 @@ function resumePlay() {
 function stopPlay() {
   stopped = true;
   paused = false;
-  isPlaying = false;
+  playingAll = false;
   speechSynthesis.cancel();
   document.getElementById("timerBox").textContent = "Timer: -";
   clearHighlight();
-  toggleSpelling(true);
 }
+
+/* ===================== CORE ===================== */
 
 async function playRow(i) {
   highlightRow(i);
 
-  // Kolom: A=nomor (0) ❌, B=kata (1) ✅, C=kalimat (2) ✅, D=kata (3) ✅
+  // ❌ kolom 1 (nomor) tidak dibaca
+  // ✅ kolom 2,3,4 dibaca
   await speak(rows[i][1]);
-  await wait(GAP);
+  await wait(GAP_COL);
   await speak(rows[i][2]);
-  await wait(GAP);
+  await wait(GAP_COL);
   await speak(rows[i][3]);
 
   await startRowTimer();
@@ -198,6 +196,7 @@ async function playRow(i) {
 
 function speak(text) {
   return new Promise(resolve => {
+    if (!text) return resolve();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "en-US";
     u.onend = resolve;
@@ -227,33 +226,25 @@ function clearHighlight() {
   document.querySelectorAll("tr").forEach(tr => tr.classList.remove("active"));
 }
 
-// 🔤 SPELLING — HANYA JALAN JIKA DIKLIK MANUAL
+/* ===================== SPELLING (MANUAL) ===================== */
+
 async function spellingRow(i) {
-  if (isPlaying) return; // tidak boleh saat play all
+  if (playingAll) return; // ❌ tidak jalan saat play all
 
   const word = rows[i][3];
   if (!word) return;
 
+  speechSynthesis.cancel();
+
   await speak(word);
-  await wait(300);
+  await wait(GAP_SPELL);
 
   for (let c of word) {
     await speak(c);
-    await wait(300);
+    await wait(GAP_SPELL);
   }
 
   await speak(word);
-}
-
-function toggleSpelling(enable) {
-  document.querySelectorAll(".spellBtn").forEach(btn => {
-    btn.disabled = !enable;
-  });
-}
-
-// PWA
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
 }
 </script>
 
