@@ -32,18 +32,18 @@ html,body{
 }
 #title{
   text-align:center;
-  font-size:28px;
+  font-size:30px;
   font-weight:900;
 }
 #subtitle{
   text-align:center;
   font-size:14px;
-  opacity:.8;
+  opacity:.5;
   margin-bottom:10px;
 }
 #topBtns{
   display:flex;
-  gap:8px;
+  gap:25px;
 }
 .btn{
   flex:1;
@@ -53,8 +53,8 @@ html,body{
   font-weight:800;
 }
 .play{background:var(--primary);color:#fff;}
-.pause{background:var(--warn);}
-.stop{background:var(--danger);color:#fff;}
+.pause{background:var(--primary);color:#fff;}
+.stop{background:var(--primary);color:#fff;}
 
 #fileBox{
   margin-top:8px;
@@ -69,7 +69,7 @@ html,body{
   height:34px;
   padding:0 14px;
   border-radius:14px;
-  background:var(--blue);
+  background:var(--WARN);
   color:#fff;
   font-weight:700;
   font-size:13px;
@@ -82,7 +82,7 @@ html,body{
   height:34px;
   padding:0 14px;
   border-radius:14px;
-  background:var(--blue);
+  background:var(--DANGER);
   color:#fff;
   font-weight:700;
   font-size:13px;
@@ -214,7 +214,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 <!-- TOP -->
 <div id="top">
-  <div id="title">Spelling Bee</div>
+  <div id="title">SPELLING BEE</div>
   <div id="subtitle">
     Aplikasi ini membantu latihan Spelling Bee untuk writing dan speaking melalui pembacaan kata, kalimat, dan ejaan secara otomatis
   </div>
@@ -448,6 +448,7 @@ function closeHelp(e){
 
 </body>
 </html>
+
 
 
 
