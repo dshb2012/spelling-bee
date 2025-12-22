@@ -346,7 +346,7 @@ function pauseResume(){
   buttonFeedback();
   paused=!paused;
   paused?speechSynthesis.pause():speechSynthesis.resume();
-  pauseBtn.textContent=paused?"▶ Resume":"⏸ Pause";
+  pauseBtn.textContent=paused?"▶ RESUME":"⏸ PAUSE";
 }
 function stopAll(){
   playing=false;
@@ -365,3 +365,4 @@ function toggleBell(){
 
 </body>
 </html>
+
