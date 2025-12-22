@@ -8,7 +8,6 @@
 <style>
 :root{
   --bg:#eef6f1;
-  --card:#ffffff;
   --primary:#5fb3a2;
   --warn:#ffd166;
   --danger:#ef476f;
@@ -57,16 +56,8 @@ body{
 .pause{background:var(--warn)}
 .stop{background:var(--danger);color:#fff}
 
-/* ===== FILE INPUT ===== */
-#fileBox{
-  margin-top:10px;
-  text-align:center;
-}
-
-#fileInput{
-  display:none;
-}
-
+/* FILE */
+#fileBox{text-align:center;margin-top:8px}
 .fileBtn{
   background:#7b9fe0;
   color:#fff;
@@ -76,10 +67,10 @@ body{
   font-weight:700;
 }
 
-/* ===== TABLE ===== */
+/* TABLE */
 .wrapper{
-  padding-top:200px;
-  padding-bottom:110px;
+  padding-top:190px;
+  padding-bottom:100px;
 }
 
 table{
@@ -87,20 +78,9 @@ table{
   border-collapse:collapse;
 }
 
-thead{
-  position:sticky;
-  top:200px;
-  z-index:500;
-}
-
-th{
-  background:#dcefe8;
+th,td{
   padding:10px;
-}
-
-td{
   background:#fff;
-  padding:10px;
   border-bottom:1px solid #ddd;
 }
 
@@ -148,43 +128,34 @@ tr.active td{
 
 <body>
 
-<!-- ===== TOP ===== -->
+<!-- TOP -->
 <div id="top">
   <div id="title">Spelling Bee – Writing Practice</div>
-
   <div id="topBtns">
     <button class="btn play" onclick="playAll()">▶ Play All</button>
-    <button class="btn pause" onclick="pauseResume()" id="pauseBtn">⏸ Pause/Resume</button>
+    <button class="btn pause" onclick="pauseResume()" id="pauseBtn">⏸ Pause</button>
     <button class="btn stop" onclick="stopAll()">⏹ Stop</button>
   </div>
 
   <div id="fileBox">
     <label class="fileBtn">
       📂 Choose CSV File
-      <input type="file" id="fileInput" accept=".csv" onchange="loadCSV(event)">
+      <input type="file" accept=".csv" hidden onchange="loadCSV(event)">
     </label>
   </div>
 </div>
 
-<!-- ===== TABLE ===== -->
+<!-- TABLE -->
 <div class="wrapper">
 <table>
-<thead>
-<tr>
-  <th>No</th>
-  <th>Word</th>
-  <th>Sentence</th>
-  <th>Word</th>
-  <th>Spelling</th>
-</tr>
-</thead>
+<thead id="thead"></thead>
 <tbody id="tbody"></tbody>
 </table>
 </div>
 
-<!-- ===== BOTTOM ===== -->
+<!-- BOTTOM -->
 <div id="bottom">
-  Start
+  Start Row
   <input type="number" id="startRow" value="1" min="1">
   <button class="btn play" onclick="playFromRow()">▶</button>
   <button class="btn pause" onclick="toggleBell()" id="bellBtn">🔔</button>
@@ -192,7 +163,7 @@ tr.active td{
 </div>
 
 <script>
-let rows=[], current=0, playing=false, paused=false;
+let rows=[], headers=[], current=0, playing=false, paused=false;
 let bellOn=true, timerInt;
 const audioCtx=new (window.AudioContext||webkitAudioContext)();
 
@@ -202,7 +173,7 @@ function beep(freq){
   o.frequency.value=freq;
   o.connect(g); g.connect(audioCtx.destination);
   o.start();
-  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.2);
+  g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.2);
 }
 
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -214,15 +185,18 @@ const speak=t=>new Promise(r=>{
 });
 
 function loadCSV(e){
-  const reader=new FileReader();
-  reader.onload=()=>{
-    rows=reader.result.trim().split("\n").map(r=>r.split(","));
+  const r=new FileReader();
+  r.onload=()=>{
+    const lines=r.result.trim().split("\n").map(l=>l.split(","));
+    headers=lines.shift();   // baris pertama = judul
+    rows=lines;              // data
     render();
   };
-  reader.readAsText(e.target.files[0]);
+  r.readAsText(e.target.files[0]);
 }
 
 function render(){
+  thead.innerHTML="<tr>"+headers.map(h=>`<th>${h}</th>`).join("")+"<th>Spelling</th></tr>";
   tbody.innerHTML="";
   rows.forEach((r,i)=>{
     let tr=document.createElement("tr");
@@ -243,10 +217,7 @@ function render(){
 }
 
 function scrollToRow(i){
-  tbody.children[i].scrollIntoView({
-    behavior:"smooth",
-    block:"center"
-  });
+  tbody.children[i].scrollIntoView({behavior:"smooth",block:"center"});
 }
 
 async function playRow(i){
@@ -268,17 +239,15 @@ function startTimer(){
       if(paused) return;
       t--; timer.textContent=t;
       if(bellOn) beep(300+(20-t)*35);
-      if(t<=0){
-        clearInterval(timerInt);
-        res();
-      }
+      if(t<=0){clearInterval(timerInt);res();}
     },1000);
   });
 }
 
+/* ===== CONTROL ===== */
 async function playAll(){
   stopAll();
-  current=0;
+  current=0;          // SELALU dari awal data
   playing=true;
   for(;current<rows.length && playing;current++){
     while(paused) await wait(200);
@@ -286,14 +255,14 @@ async function playAll(){
   }
 }
 
-function playFromRow(){
+async function playFromRow(){
   stopAll();
   current=Math.max(0,startRow.value-1);
   playing=true;
-  playRow(current).then(()=>{
-    current++;
-    playAll();
-  });
+  for(;current<rows.length && playing;current++){
+    while(paused) await wait(200);
+    await playRow(current);
+  }
 }
 
 function pauseResume(){
