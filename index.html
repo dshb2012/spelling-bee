@@ -140,7 +140,185 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   border-radius:14px;
   font-weight:800;
 }
+/* Help Button */
+.help-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.help-btn:active {
+  transform: scale(0.95);
+}
+
+/* Modal Background */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 9999;
+}
+
+/* Modal Content */
+.modal-content {
+  background: #ffffff;
+  margin: auto;
+  margin-top: 8vh;
+  width: 90%;
+  max-width: 520px;
+  border-radius: 16px;
+  padding: 20px;
+  font-family: system-ui, Arial, sans-serif;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Animation */
+.animate {
+  animation: zoomFade 0.3s ease;
+}
+
+@keyframes zoomFade {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+/* Help Items */
+.help-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.help-item .icon {
+  font-size: 22px;
+  width: 30px;
+}
+
+.help-item p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Tips Box */
+.tips-box {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f0f9ff;
+  border-left: 5px solid #0ea5e9;
+  border-radius: 10px;
+}
+
+.tips-box h3 {
+  margin-top: 0;
+}  
+ 
 </style>
+
+<!-- Help Button -->
+<button id="helpBtn" class="help-btn" title="Petunjuk">❓</button>
+
+<!-- Help Modal -->
+<div id="helpModal" class="modal">
+  <div class="modal-content animate">
+    <span class="close-btn" id="closeHelp">✕</span>
+
+    <h2>📘 Cara Menggunakan</h2>
+
+    <div class="help-item">
+      <span class="icon">📂</span>
+      <div>
+        <b>Choose File</b>
+        <p>Pilih file CSV berisi daftar Word dan Sentence.</p>
+      </div>
+    </div>
+
+    <div class="help-item">
+      <span class="icon">▶</span>
+      <div>
+        <b>Play All</b>
+        <p>Membaca semua baris otomatis:<br>
+        <i>Word → Sentence → Word → Timer 20 detik</i></p>
+      </div>
+    </div>
+
+    <div class="help-item">
+      <span class="icon">⏸</span>
+      <div>
+        <b>Pause / Resume</b>
+        <p>Menjeda dan melanjutkan suara atau timer.</p>
+      </div>
+    </div>
+
+    <div class="help-item">
+      <span class="icon">⏹</span>
+      <div>
+        <b>Stop</b>
+        <p>Menghentikan semua proses dan reset.</p>
+      </div>
+    </div>
+
+    <div class="help-item">
+      <span class="icon">🔢</span>
+      <div>
+        <b>Start Row</b>
+        <p>Mulai membaca dari baris tertentu.</p>
+      </div>
+    </div>
+
+    <div class="help-item">
+      <span class="icon">🔊</span>
+      <div>
+        <b>Speak</b>
+        <p>Membaca satu baris untuk latihan berbicara.</p>
+      </div>
+    </div>
+
+    <div class="help-item">
+      <span class="icon">🔠</span>
+      <div>
+        <b>Spell</b>
+        <p>Membacakan ejaan kata (huruf per huruf).</p>
+      </div>
+    </div>
+
+    <div class="tips-box">
+      <h3>✨ Tips Belajar</h3>
+      <p>📝 <b>Play All</b> → Latihan <b>Writing Spelling Bee</b></p>
+      <p>🗣️ <b>Speak</b> → Latihan <b>Speaking Spelling Bee</b></p>
+    </div>
+
+  </div>
+</div>
+
 </head>
 
 <body>
@@ -363,6 +541,28 @@ function toggleBell(){
   bellBtn.textContent=bellOn?"🔔":"🔕";
 }
 </script>
+  
+<script>
+  const helpBtn = document.getElementById("helpBtn");
+  const helpModal = document.getElementById("helpModal");
+  const closeHelp = document.getElementById("closeHelp");
 
+  helpBtn.addEventListener("click", () => {
+    helpModal.style.display = "block";
+    navigator.vibrate?.(60);
+  });
+
+  closeHelp.addEventListener("click", () => {
+    helpModal.style.display = "none";
+  });
+
+  window.addEventListener("click", (e) => {
+    if (e.target === helpModal) {
+      helpModal.style.display = "none";
+    }
+  });
+</script>
+  
 </body>
 </html>
+
