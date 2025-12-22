@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Spelling Bee - Writing Practice</title>
+<title>SPELLING BEE</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -21,7 +21,7 @@ html,body{
 }
 .app{background:var(--bg);}
 
-/* ===== TOP STICKY ===== */
+/* ===== TOP ===== */
 #top{
   position:fixed;
   top:0;left:0;right:0;
@@ -33,7 +33,7 @@ html,body{
 #title{
   text-align:center;
   font-size:20px;
-  font-weight:700;
+  font-weight:800;
   margin-bottom:8px;
 }
 #topBtns{
@@ -45,7 +45,7 @@ html,body{
   height:44px;
   border:none;
   border-radius:16px;
-  font-weight:700;
+  font-weight:800;
 }
 .play{background:var(--primary);color:#fff;}
 .pause{background:var(--warn);}
@@ -84,44 +84,38 @@ th,td{
   background:#fff;
   vertical-align:top;
 }
+tr.active td{background:#fff3bf;}
 
-/* Word */
 .word{
   font-size:16px;
-  font-weight:700;
+  font-weight:800;
   white-space:nowrap;
-  word-break:keep-all;
-  text-align:left;
 }
-
-/* Sentence */
 .sentence{
   font-size:14px;
   line-height:1.5;
-  white-space:normal;
   word-break:normal;
   overflow-wrap:break-word;
 }
-
-tr.active td{background:#fff3bf;}
-
 .spellBtn{
   background:var(--blue);
   color:#fff;
   border:none;
-  padding:6px 12px;
+  padding:6px 10px;
   border-radius:12px;
   font-weight:700;
   font-size:13px;
+  margin:2px;
+  width:70px;
 }
 
-/* Column widths */
+/* Column width */
 th:nth-child(1),td:nth-child(1){width:10%;}
 th:nth-child(2),td:nth-child(2){width:30%;}
 th:nth-child(3),td:nth-child(3){width:40%;}
 th:nth-child(4),td:nth-child(4){width:20%;}
 
-/* ===== BOTTOM STICKY ===== */
+/* ===== BOTTOM ===== */
 #bottom{
   position:fixed;
   bottom:0;left:0;right:0;
@@ -134,7 +128,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   box-shadow:0 -6px 12px rgba(0,0,0,.15);
 }
 #startRow{
-  width:64px;
+  width:60px;
   height:36px;
   border-radius:12px;
   border:none;
@@ -145,7 +139,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   background:#fff;
   padding:10px 16px;
   border-radius:14px;
-  font-weight:700;
+  font-weight:800;
 }
 </style>
 </head>
@@ -155,15 +149,15 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 <!-- TOP -->
 <div id="top">
-  <div id="title">Spelling Bee – Writing Practice</div>
+  <div id="title">SPELLING BEE</div>
   <div id="topBtns">
-    <button class="btn play" onclick="playAll()">▶ Play All</button>
-    <button class="btn pause" id="pauseBtn" onclick="pauseResume()">⏸ Pause</button>
-    <button class="btn stop" onclick="stopAll()">⏹ Stop</button>
+    <button class="btn play" onclick="playAll()">▶ PLAY ALL</button>
+    <button class="btn pause" id="pauseBtn" onclick="pauseResume()">⏸ PAUSE</button>
+    <button class="btn stop" onclick="stopAll()">⏹ STOP</button>
   </div>
   <div id="fileBox">
     <label class="fileBtn">
-      📂 Choose File
+      📂 CHOOSE FILE
       <input type="file" accept=".csv" onchange="loadCSV(event)">
     </label>
   </div>
@@ -171,22 +165,22 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 <!-- TABLE -->
 <div class="wrapper">
-  <table>
-    <thead>
-      <tr>
-        <th>No.</th>
-        <th>Word</th>
-        <th>Sentence</th>
-        <th>Spelling</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
+<table>
+<thead>
+<tr>
+  <th>No.</th>
+  <th>Word</th>
+  <th>Sentence</th>
+  <th>Action</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
 </div>
 
 <!-- BOTTOM -->
 <div id="bottom">
-  Start Row
+  START ROW
   <input type="number" id="startRow" value="1" min="1">
   <button class="btn play" onclick="playFromRow()">▶</button>
   <button class="btn pause" id="bellBtn" onclick="toggleBell()">🔔</button>
@@ -201,9 +195,8 @@ let current=0, playing=false, paused=false;
 let bellOn=true, timerInterval=null;
 const audioCtx=new (window.AudioContext||webkitAudioContext)();
 
-function clearTimer(){
-  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
-}
+/* ===== UTIL ===== */
+function clearTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
 async function wait(ms){
   let t=0;
   while(t<ms){
@@ -219,15 +212,25 @@ function speak(text){
     speechSynthesis.speak(u);
   });
 }
+function buttonFeedback(){
+  if(navigator.vibrate)navigator.vibrate(30);
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.frequency.value=600;
+  g.gain.value=0.05;
+  o.connect(g);g.connect(audioCtx.destination);
+  o.start();o.stop(audioCtx.currentTime+0.08);
+}
 function beep(freq){
   const o=audioCtx.createOscillator();
   const g=audioCtx.createGain();
   o.frequency.value=freq;
-  o.connect(g); g.connect(audioCtx.destination);
+  o.connect(g);g.connect(audioCtx.destination);
   o.start();
   g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.2);
 }
 
+/* ===== CSV ===== */
 function loadCSV(e){
   const r=new FileReader();
   r.onload=()=>{
@@ -239,6 +242,7 @@ function loadCSV(e){
   r.readAsText(e.target.files[0]);
 }
 
+/* ===== TABLE ===== */
 function render(){
   tbody.innerHTML="";
   rows.forEach((r,i)=>{
@@ -247,18 +251,20 @@ function render(){
       <td>${r[0]}</td>
       <td class="word">${r[1]}</td>
       <td class="sentence">${r[2]}</td>
-      <td><button class="spellBtn" onclick="spell(${i})">Spell</button></td>
-    `;
+      <td>
+        <button class="spellBtn" onclick="speakRow(${i})">🔊 SPEAK</button>
+        <button class="spellBtn" onclick="spell(${i})">🔠 SPELL</button>
+      </td>`;
     tbody.appendChild(tr);
   });
 }
-
 function focusRow(i){
   [...tbody.children].forEach(r=>r.classList.remove("active"));
   tbody.children[i].classList.add("active");
   tbody.children[i].scrollIntoView({behavior:"smooth",block:"center"});
 }
 
+/* ===== TIMER ===== */
 function timer20(){
   return new Promise(res=>{
     clearTimer();
@@ -274,20 +280,20 @@ function timer20(){
   });
 }
 
+/* ===== PLAY ===== */
 async function playRow(i){
   focusRow(i);
-  const word=rows[i][1];
-  const sentence=rows[i][2];
-
-  await speak(word);
+  const w=rows[i][1], s=rows[i][2];
+  await speak(w);
   await wait(500);
-  await speak(sentence);
+  await speak(s);
   await wait(500);
-  await speak(word);
+  await speak(w);
   await timer20();
 }
 
 async function playAll(){
+  buttonFeedback();
   stopAll();
   current=0;
   playing=true;
@@ -296,7 +302,9 @@ async function playAll(){
     await playRow(current);
   }
 }
+
 async function playFromRow(){
+  buttonFeedback();
   stopAll();
   current=Math.max(0,startRow.value-1);
   playing=true;
@@ -306,7 +314,23 @@ async function playFromRow(){
   }
 }
 
+/* ===== MANUAL ===== */
+async function speakRow(i){
+  buttonFeedback();
+  stopAll();
+  focusRow(i);
+  const w=rows[i][1], s=rows[i][2];
+  await speak(w);
+  await wait(500);
+  await speak(s);
+  await wait(500);
+  await speak(w);
+}
+
 async function spell(i){
+  buttonFeedback();
+  stopAll();
+  focusRow(i);
   const w=rows[i][1];
   await speak(w);
   await wait(400);
@@ -317,7 +341,9 @@ async function spell(i){
   await speak(w);
 }
 
+/* ===== CONTROL ===== */
 function pauseResume(){
+  buttonFeedback();
   paused=!paused;
   paused?speechSynthesis.pause():speechSynthesis.resume();
   pauseBtn.textContent=paused?"▶ Resume":"⏸ Pause";
@@ -331,6 +357,7 @@ function stopAll(){
   pauseBtn.textContent="⏸ Pause";
 }
 function toggleBell(){
+  buttonFeedback();
   bellOn=!bellOn;
   bellBtn.textContent=bellOn?"🔔":"🔕";
 }
