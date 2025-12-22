@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Spelling Bee - Writing Practice</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 html,body{
@@ -15,10 +15,11 @@ html,body{
 }
 :root{
   --bg:#eef6f1;
-  --card:#fff;
+  --card:#ffffff;
   --primary:#5fb3a2;
   --warn:#ffd166;
   --danger:#ef476f;
+  --blue:#6c8cff;
 }
 .app{background:var(--bg);}
 
@@ -43,51 +44,75 @@ html,body{
 }
 .btn{
   flex:1;
-  padding:12px;
+  height:44px;
   border:none;
-  border-radius:18px;
+  border-radius:16px;
   font-weight:700;
+  font-size:14px;
 }
 .play{background:var(--primary);color:#fff;}
 .pause{background:var(--warn);}
 .stop{background:var(--danger);color:#fff;}
 
-#fileBox{text-align:center;margin-top:8px;}
-.fileBtn{
-  background:#7b9fe0;
-  color:#fff;
-  padding:10px 16px;
-  border-radius:16px;
-  font-weight:700;
+/* FILE BUTTON (PROPORSIONAL) */
+#fileBox{
+  margin-top:8px;
+  text-align:center;
 }
+.fileBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:40px;
+  padding:0 16px;
+  border-radius:14px;
+  background:var(--blue);
+  color:#fff;
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+}
+.fileBtn input{display:none;}
 
 /* ===== TABLE ===== */
 .wrapper{
-  padding-top:210px;
+  padding-top:200px;
   padding-bottom:130px;
+  overflow-x:auto;
 }
 table{
   width:100%;
-  table-layout:fixed;
   border-collapse:collapse;
+  table-layout:auto; /* 🔑 PENTING */
 }
 th,td{
-  padding:12px 10px;
+  padding:10px 12px;
   background:#fff;
   border-bottom:1px solid #ddd;
-  word-break:break-word;
+  vertical-align:top;
   white-space:normal;
-  line-height:1.45;
+  word-break:break-word;
+  line-height:1.5;
   font-size:14px;
 }
+
+/* Lebar kolom cerdas */
+th:nth-child(1), td:nth-child(1){min-width:48px;}
+th:nth-child(2), td:nth-child(2){min-width:110px;}
+th:nth-child(3), td:nth-child(3){min-width:220px;}
+th:nth-child(4), td:nth-child(4){min-width:110px;}
+th:nth-child(5), td:nth-child(5){min-width:90px;}
+
 tr.active td{background:#fff3bf;}
+
 .spellBtn{
-  background:#7b9fe0;
+  background:var(--blue);
   color:#fff;
   border:none;
   padding:6px 12px;
   border-radius:12px;
   font-weight:600;
+  font-size:13px;
 }
 
 /* ===== BOTTOM ===== */
@@ -103,10 +128,11 @@ tr.active td{background:#fff3bf;}
   box-shadow:0 -6px 12px rgba(0,0,0,.15);
 }
 #startRow{
-  width:60px;
-  padding:8px;
+  width:64px;
+  height:38px;
   border-radius:12px;
   border:none;
+  text-align:center;
 }
 #timer{
   margin-left:auto;
@@ -130,8 +156,8 @@ tr.active td{background:#fff3bf;}
   </div>
   <div id="fileBox">
     <label class="fileBtn">
-      📂 Choose CSV File
-      <input type="file" accept=".csv" hidden onchange="loadCSV(event)">
+      📂 Choose File
+      <input type="file" accept=".csv" onchange="loadCSV(event)">
     </label>
   </div>
 </div>
@@ -159,16 +185,13 @@ let current=0, playing=false, paused=false;
 let bellOn=true, timerInt;
 const audioCtx=new (window.AudioContext||webkitAudioContext)();
 
-/* ===== UTIL PAUSE SAFE ===== */
 async function wait(ms){
   let t=0;
   while(t<ms){
-    if(!paused){t+=100;}
+    if(!paused)t+=100;
     await new Promise(r=>setTimeout(r,100));
   }
 }
-
-/* ===== SPEAK SAFE ===== */
 function speak(text){
   return new Promise(res=>{
     const u=new SpeechSynthesisUtterance(text);
@@ -177,8 +200,6 @@ function speak(text){
     speechSynthesis.speak(u);
   });
 }
-
-/* ===== BEEP ===== */
 function beep(freq){
   const o=audioCtx.createOscillator();
   const g=audioCtx.createGain();
@@ -188,7 +209,6 @@ function beep(freq){
   g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+0.2);
 }
 
-/* ===== CSV ===== */
 function loadCSV(e){
   const r=new FileReader();
   r.onload=()=>{
@@ -200,7 +220,6 @@ function loadCSV(e){
   r.readAsText(e.target.files[0]);
 }
 
-/* ===== RENDER ===== */
 function render(){
   thead.innerHTML="<tr>"+headers.map(h=>`<th>${h}</th>`).join("")+"<th>Spelling</th></tr>";
   tbody.innerHTML="";
@@ -222,14 +241,12 @@ function render(){
   });
 }
 
-/* ===== SCROLL ===== */
 function focusRow(i){
   document.querySelectorAll("tr").forEach(r=>r.classList.remove("active"));
   tbody.children[i].classList.add("active");
   tbody.children[i].scrollIntoView({behavior:"smooth",block:"center"});
 }
 
-/* ===== PLAY ===== */
 async function playRow(i){
   focusRow(i);
   await speak(rows[i][1]);
@@ -245,10 +262,10 @@ function timer20(){
     let t=20;
     timer.textContent=t;
     timerInt=setInterval(()=>{
-      if(paused) return;
+      if(paused)return;
       t--;
       timer.textContent=t;
-      if(bellOn) beep(300+(20-t)*30);
+      if(bellOn)beep(300+(20-t)*25);
       if(t<=0){
         clearInterval(timerInt);
         res();
@@ -262,22 +279,19 @@ async function playAll(){
   current=0;
   playing=true;
   for(;current<rows.length && playing;current++){
-    while(paused) await wait(200);
+    while(paused)await wait(200);
     await playRow(current);
   }
 }
-
 async function playFromRow(){
   stopAll();
   current=Math.max(0,startRow.value-1);
   playing=true;
   for(;current<rows.length && playing;current++){
-    while(paused) await wait(200);
+    while(paused)await wait(200);
     await playRow(current);
   }
 }
-
-/* ===== SPELL ===== */
 async function spell(i){
   const w=rows[i][3];
   await speak(w);
@@ -289,11 +303,10 @@ async function spell(i){
   await speak(w);
 }
 
-/* ===== CONTROLS ===== */
 function pauseResume(){
   paused=!paused;
-  if(paused){speechSynthesis.pause();}
-  else{speechSynthesis.resume();}
+  if(paused)speechSynthesis.pause();
+  else speechSynthesis.resume();
   pauseBtn.textContent=paused?"▶ Resume":"⏸ Pause";
 }
 function stopAll(){
