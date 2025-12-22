@@ -1,202 +1,166 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<title>Spelling Bee - Writing Practice</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spelling Bee</title>
 
 <style>
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding-top: 60px;
+  font-family: Arial, sans-serif;
+  background: #f8fafc;
 }
 
-#timerBox {
-  position: fixed;
+/* ===== CONTROL PANEL ===== */
+#controlPanel {
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  background: #1976d2;
-  color: white;
-  font-size: 18px;
-  text-align: center;
-  padding: 10px;
-  z-index: 9999;
-}
+  z-index: 1000;
 
-.controls {
   display: flex;
-  gap: 6px;
   flex-wrap: wrap;
-  margin: 10px;
+  gap: 10px;
+  align-items: center;
+
+  background: #ffffff;
+  padding: 14px;
+  border-bottom: 2px solid #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-button {
-  padding: 8px 12px;
+#controlPanel button {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
   font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
-button:disabled {
-  opacity: 0.5;
+/* Play All */
+#controlPanel button:nth-child(1) {
+  background: #22c55e;
+  color: white;
 }
 
+/* Pause */
+#controlPanel button:nth-child(2) {
+  background: #facc15;
+  color: #333;
+}
+
+/* Stop */
+#controlPanel button:nth-child(3) {
+  background: #ef4444;
+  color: white;
+}
+
+/* Bell */
+#bellBtn {
+  background: #3b82f6;
+  color: white;
+}
+
+#timerDisplay,
+#progressDisplay {
+  margin-left: auto;
+  background: #f1f5f9;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+/* ===== TITLE ===== */
+#appTitle {
+  text-align: center;
+  margin: 18px 0;
+  color: #2563eb;
+}
+
+/* ===== TABLE ===== */
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
-td, th {
-  border: 1px solid #ccc;
-  padding: 6px;
+th {
+  background: #e0e7ff;
+  padding: 10px;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
 }
 
 tr.active {
-  background: #c8e6ff;
+  background: #fff6cc;
+}
+
+.spellBtn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div id="timerBox">Timer: -</div>
-
-<div class="controls">
-  <input type="file" id="fileInput" accept=".csv">
+<!-- CONTROL PANEL -->
+<div id="controlPanel">
   <button onclick="playAll()">▶ Play All</button>
-  <button onclick="pausePlay()">⏸ Pause</button>
-  <button onclick="resumePlay()">▶ Resume</button>
+  <button onclick="pauseResume()">⏸ Pause / Resume</button>
   <button onclick="stopPlay()">⏹ Stop</button>
 
-  <input type="number" id="startRow" placeholder="Baris ke..." style="width:90px">
-  <button onclick="playFromRow()">🔢 Play dari Baris</button>
+  <span>
+    Start row:
+    <input type="number" id="startRow" value="1" min="1" style="width:60px;">
+    <button onclick="playFromRow()">▶</button>
+  </span>
+
+  <button id="bellBtn" onclick="toggleBell()">🔔 Bell ON</button>
+
+  <span id="timerDisplay">⏱ 20</span>
+  <span id="progressDisplay">📘 0 / 0</span>
 </div>
 
-<table id="dataTable"></table>
+<h1 id="appTitle">Spelling Bee – Writing Practice</h1>
+
+<input type="file" accept=".csv" onchange="loadCSV(event)" style="margin:10px;">
+
+<table>
+<thead>
+<tr>
+  <th>No.</th>
+  <th>Word</th>
+  <th>Sentence</th>
+  <th>Word</th>
+  <th>Spelling</th>
+</tr>
+</thead>
+<tbody id="dataTable"></tbody>
+</table>
 
 <script>
 let rows = [];
-let stopped = false;
+let currentRow = 0;
+let playing = false;
 let paused = false;
-let playingAll = false;
+let bellMuted = false;
+let completedRows = 0;
+let timerInterval;
+let beepCtx;
 
-const GAP_COL = 500;   // ✅ 0.5 detik antar kolom
-const GAP_SPELL = 400; // 0.4 detik spelling
-const ROW_DELAY = 20;  // 20 detik antar baris
-
-document.getElementById("fileInput").addEventListener("change", loadCSV);
-
-function loadCSV(e) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    rows = reader.result
-      .trim()
-      .split("\n")
-      .map(r => r.split(",").map(c => c.trim()));
-    renderTable();
-  };
-  reader.readAsText(e.target.files[0]);
-}
-
-function renderTable() {
-  const table = document.getElementById("dataTable");
-  table.innerHTML = "";
-
-  rows.forEach((r, i) => {
-    const tr = document.createElement("tr");
-
-    r.forEach(cell => {
-      const td = document.createElement("td");
-      td.textContent = cell;
-      tr.appendChild(td);
-    });
-
-    const tdSpell = document.createElement("td");
-    const btn = document.createElement("button");
-    btn.textContent = "🔤 Spelling";
-    btn.onclick = () => spellingRow(i);
-    tdSpell.appendChild(btn);
-    tr.appendChild(tdSpell);
-
-    table.appendChild(tr);
-  });
-}
-
-/* ===================== PLAY ===================== */
-
-async function playAll() {
-  stopPlay();
-  stopped = false;
-  paused = false;
-  playingAll = true;
-
-  for (let i = 0; i < rows.length; i++) {
-    if (stopped) break;
-    await playRow(i);
-  }
-
-  playingAll = false;
-}
-
-function playFromRow() {
-  stopPlay();
-  stopped = false;
-  paused = false;
-  playingAll = true;
-
-  const start = parseInt(document.getElementById("startRow").value) - 1;
-  if (isNaN(start) || start < 0 || start >= rows.length) {
-    playingAll = false;
-    return;
-  }
-
-  (async () => {
-    for (let i = start; i < rows.length; i++) {
-      if (stopped) break;
-      await playRow(i);
-    }
-    playingAll = false;
-  })();
-}
-
-function pausePlay() {
-  paused = true;
-  speechSynthesis.pause();
-}
-
-function resumePlay() {
-  paused = false;
-  speechSynthesis.resume();
-}
-
-function stopPlay() {
-  stopped = true;
-  paused = false;
-  playingAll = false;
-  speechSynthesis.cancel();
-  document.getElementById("timerBox").textContent = "Timer: -";
-  clearHighlight();
-}
-
-/* ===================== CORE ===================== */
-
-async function playRow(i) {
-  highlightRow(i);
-
-  // ❌ kolom 1 (nomor) tidak dibaca
-  // ✅ kolom 2,3,4 dibaca
-  await speak(rows[i][1]);
-  await wait(GAP_COL);
-  await speak(rows[i][2]);
-  await wait(GAP_COL);
-  await speak(rows[i][3]);
-
-  await startRowTimer();
-}
+/* ===== UTIL ===== */
+const wait = ms => new Promise(r => setTimeout(r, ms));
 
 function speak(text) {
   return new Promise(resolve => {
-    if (!text) return resolve();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = "en-US";
     u.onend = resolve;
@@ -204,49 +168,138 @@ function speak(text) {
   });
 }
 
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+/* ===== BEEP ===== */
+function beep(freq=800, dur=0.15) {
+  if (bellMuted) return;
+  if (!beepCtx) beepCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = beepCtx.createOscillator();
+  const gain = beepCtx.createGain();
+  osc.frequency.value = freq;
+  osc.connect(gain);
+  gain.connect(beepCtx.destination);
+  osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.001, beepCtx.currentTime + dur);
+  osc.stop(beepCtx.currentTime + dur);
 }
 
-async function startRowTimer() {
-  for (let i = ROW_DELAY; i > 0; i--) {
-    if (stopped) break;
-    document.getElementById("timerBox").textContent = "Next row in " + i + "s";
-    await wait(1000);
+/* ===== LOAD CSV ===== */
+function loadCSV(e) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    rows = reader.result.split("\n").map(r => r.split(","));
+    renderTable();
+    completedRows = 0;
+    updateProgress();
+  };
+  reader.readAsText(e.target.files[0]);
+}
+
+/* ===== RENDER ===== */
+function renderTable() {
+  const tb = document.getElementById("dataTable");
+  tb.innerHTML = "";
+  rows.forEach((r,i) => {
+    const tr = document.createElement("tr");
+    r.forEach(c => {
+      const td = document.createElement("td");
+      td.textContent = c;
+      tr.appendChild(td);
+    });
+    const td = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.textContent = "🔤 Spell";
+    btn.className = "spellBtn";
+    btn.onclick = () => spellingRow(i);
+    td.appendChild(btn);
+    tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+}
+
+/* ===== PLAY ===== */
+async function playRow(i) {
+  document.querySelectorAll("tr").forEach(r => r.classList.remove("active"));
+  document.querySelectorAll("tr")[i+1].classList.add("active");
+
+  await speak(rows[i][1]);
+  await wait(500);
+  await speak(rows[i][2]);
+  await wait(500);
+  await speak(rows[i][3]);
+
+  completedRows++;
+  updateProgress();
+  await startTimer();
+}
+
+async function playAll() {
+  stopPlay();
+  playing = true;
+  completedRows = 0;
+  updateProgress();
+  for (currentRow = 0; currentRow < rows.length && playing; currentRow++) {
+    while (paused) await wait(300);
+    await playRow(currentRow);
   }
-  document.getElementById("timerBox").textContent = "Timer: -";
 }
 
-function highlightRow(i) {
-  clearHighlight();
-  document.querySelectorAll("tr")[i]?.classList.add("active");
+function playFromRow() {
+  currentRow = Math.max(0, document.getElementById("startRow").value - 1);
+  playAll();
 }
 
-function clearHighlight() {
-  document.querySelectorAll("tr").forEach(tr => tr.classList.remove("active"));
+function pauseResume() {
+  paused = !paused;
 }
 
-/* ===================== SPELLING (MANUAL) ===================== */
-
-async function spellingRow(i) {
-  if (playingAll) return; // ❌ tidak jalan saat play all
-
-  const word = rows[i][3];
-  if (!word) return;
-
+function stopPlay() {
+  playing = false;
+  paused = false;
   speechSynthesis.cancel();
+  clearInterval(timerInterval);
+}
 
-  await speak(word);
-  await wait(GAP_SPELL);
+/* ===== TIMER ===== */
+function startTimer() {
+  return new Promise(resolve => {
+    let t = 20;
+    timerDisplay.textContent = `⏱ ${t}`;
+    timerInterval = setInterval(() => {
+      t--;
+      timerDisplay.textContent = `⏱ ${t}`;
+      if (t <= 5 && t > 0) beep(1200);
+      else if (t <= 10 && t > 5 && t % 2 === 0) beep(900);
+      if (t <= 0) {
+        beep(600, 0.4);
+        clearInterval(timerInterval);
+        resolve();
+      }
+    }, 1000);
+  });
+}
 
-  for (let c of word) {
+/* ===== SPELLING ===== */
+async function spellingRow(i) {
+  const w = rows[i][3];
+  if (!w) return;
+  await speak(w);
+  await wait(400);
+  for (let c of w) {
     await speak(c);
-    await wait(GAP_SPELL);
+    await wait(400);
   }
+  await speak(w);
+}
 
-  await speak(word);
+/* ===== UI ===== */
+function toggleBell() {
+  bellMuted = !bellMuted;
+  bellBtn.textContent = bellMuted ? "🔕 Bell OFF" : "🔔 Bell ON";
+}
+
+function updateProgress() {
+  progressDisplay.textContent = `📘 ${completedRows} / ${rows.length}`;
 }
 </script>
-
 </body>
 </html>
