@@ -12,24 +12,42 @@ body {
   background: #f8fafc;
 }
 
-/* ===== CONTROL PANEL ===== */
-#controlPanel {
+/* ===== STICKY HEADER ===== */
+#header {
   position: sticky;
   top: 0;
   z-index: 1000;
-
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-
   background: #ffffff;
-  padding: 14px;
-  border-bottom: 2px solid #e0e0e0;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-#controlPanel button {
+/* TITLE */
+#appTitle {
+  text-align: center;
+  padding: 12px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #2563eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* CONTROL PANEL */
+#controlPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+/* ROWS */
+.control-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* BUTTONS */
+button {
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
@@ -38,47 +56,20 @@ body {
   cursor: pointer;
 }
 
-/* Play All */
-#controlPanel button:nth-child(1) {
-  background: #22c55e;
-  color: white;
-}
+.play { background: #22c55e; color: white; }
+.pause { background: #facc15; color: #333; }
+.stop { background: #ef4444; color: white; }
+.bell { background: #3b82f6; color: white; }
 
-/* Pause */
-#controlPanel button:nth-child(2) {
-  background: #facc15;
-  color: #333;
-}
-
-/* Stop */
-#controlPanel button:nth-child(3) {
-  background: #ef4444;
-  color: white;
-}
-
-/* Bell */
-#bellBtn {
-  background: #3b82f6;
-  color: white;
-}
-
-#timerDisplay,
-#progressDisplay {
+#timerDisplay {
   margin-left: auto;
   background: #f1f5f9;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 10px;
   font-weight: bold;
 }
 
-/* ===== TITLE ===== */
-#appTitle {
-  text-align: center;
-  margin: 18px 0;
-  color: #2563eb;
-}
-
-/* ===== TABLE ===== */
+/* TABLE */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -101,35 +92,38 @@ tr.active {
 .spellBtn {
   background: #6366f1;
   color: white;
-  border: none;
   border-radius: 8px;
   padding: 6px 10px;
-  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- CONTROL PANEL -->
-<div id="controlPanel">
-  <button onclick="playAll()">▶ Play All</button>
-  <button onclick="pauseResume()">⏸ Pause / Resume</button>
-  <button onclick="stopPlay()">⏹ Stop</button>
+<!-- ===== HEADER ===== -->
+<div id="header">
+  <div id="appTitle">Spelling Bee – Writing Practice</div>
 
-  <span>
-    Start row:
-    <input type="number" id="startRow" value="1" min="1" style="width:60px;">
-    <button onclick="playFromRow()">▶</button>
-  </span>
+  <div id="controlPanel">
+    <!-- TOP ROW -->
+    <div class="control-row">
+      <button class="play" onclick="playAll()">▶ Play All</button>
+      <button class="pause" onclick="pauseResume()">⏸ Pause / Resume</button>
+      <button class="stop" onclick="stopPlay()">⏹ Stop</button>
+    </div>
 
-  <button id="bellBtn" onclick="toggleBell()">🔔 Bell ON</button>
+    <!-- BOTTOM ROW -->
+    <div class="control-row">
+      Start Row:
+      <input type="number" id="startRow" value="1" min="1" style="width:60px;">
+      <button class="play" onclick="playFromRow()">▶</button>
 
-  <span id="timerDisplay">⏱ 20</span>
-  <span id="progressDisplay">📘 0 / 0</span>
+      <button class="bell" id="bellBtn" onclick="toggleBell()">🔔 Bell ON</button>
+
+      <span id="timerDisplay">⏱ 20</span>
+    </div>
+  </div>
 </div>
-
-<h1 id="appTitle">Spelling Bee – Writing Practice</h1>
 
 <input type="file" accept=".csv" onchange="loadCSV(event)" style="margin:10px;">
 
@@ -152,7 +146,6 @@ let currentRow = 0;
 let playing = false;
 let paused = false;
 let bellMuted = false;
-let completedRows = 0;
 let timerInterval;
 let beepCtx;
 
@@ -168,7 +161,7 @@ function speak(text) {
   });
 }
 
-/* ===== BEEP ===== */
+/* ===== BELL ===== */
 function beep(freq=800, dur=0.15) {
   if (bellMuted) return;
   if (!beepCtx) beepCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -182,22 +175,19 @@ function beep(freq=800, dur=0.15) {
   osc.stop(beepCtx.currentTime + dur);
 }
 
-/* ===== LOAD CSV ===== */
+/* ===== CSV ===== */
 function loadCSV(e) {
   const reader = new FileReader();
   reader.onload = () => {
-    rows = reader.result.split("\n").map(r => r.split(","));
+    rows = reader.result.trim().split("\n").map(r => r.split(","));
     renderTable();
-    completedRows = 0;
-    updateProgress();
   };
   reader.readAsText(e.target.files[0]);
 }
 
 /* ===== RENDER ===== */
 function renderTable() {
-  const tb = document.getElementById("dataTable");
-  tb.innerHTML = "";
+  dataTable.innerHTML = "";
   rows.forEach((r,i) => {
     const tr = document.createElement("tr");
     r.forEach(c => {
@@ -212,7 +202,25 @@ function renderTable() {
     btn.onclick = () => spellingRow(i);
     td.appendChild(btn);
     tr.appendChild(td);
-    tb.appendChild(tr);
+    dataTable.appendChild(tr);
+  });
+}
+
+/* ===== TIMER ===== */
+function startTimer() {
+  return new Promise(resolve => {
+    let t = 20;
+    timerDisplay.textContent = `⏱ ${t}`;
+    timerInterval = setInterval(() => {
+      if (paused) return;
+      t--;
+      timerDisplay.textContent = `⏱ ${t}`;
+      beep(600 + (20 - t) * 20);
+      if (t <= 0) {
+        clearInterval(timerInterval);
+        resolve();
+      }
+    }, 1000);
   });
 }
 
@@ -227,24 +235,21 @@ async function playRow(i) {
   await wait(500);
   await speak(rows[i][3]);
 
-  completedRows++;
-  updateProgress();
   await startTimer();
 }
 
 async function playAll() {
   stopPlay();
   playing = true;
-  completedRows = 0;
-  updateProgress();
-  for (currentRow = 0; currentRow < rows.length && playing; currentRow++) {
-    while (paused) await wait(300);
+  for (; currentRow < rows.length && playing; currentRow++) {
+    while (paused) await wait(200);
     await playRow(currentRow);
   }
 }
 
 function playFromRow() {
-  currentRow = Math.max(0, document.getElementById("startRow").value - 1);
+  stopPlay();
+  currentRow = Math.max(0, startRow.value - 1);
   playAll();
 }
 
@@ -257,25 +262,6 @@ function stopPlay() {
   paused = false;
   speechSynthesis.cancel();
   clearInterval(timerInterval);
-}
-
-/* ===== TIMER ===== */
-function startTimer() {
-  return new Promise(resolve => {
-    let t = 20;
-    timerDisplay.textContent = `⏱ ${t}`;
-    timerInterval = setInterval(() => {
-      t--;
-      timerDisplay.textContent = `⏱ ${t}`;
-      if (t <= 5 && t > 0) beep(1200);
-      else if (t <= 10 && t > 5 && t % 2 === 0) beep(900);
-      if (t <= 0) {
-        beep(600, 0.4);
-        clearInterval(timerInterval);
-        resolve();
-      }
-    }, 1000);
-  });
 }
 
 /* ===== SPELLING ===== */
@@ -296,10 +282,7 @@ function toggleBell() {
   bellMuted = !bellMuted;
   bellBtn.textContent = bellMuted ? "🔕 Bell OFF" : "🔔 Bell ON";
 }
-
-function updateProgress() {
-  progressDisplay.textContent = `📘 ${completedRows} / ${rows.length}`;
-}
 </script>
+
 </body>
 </html>
