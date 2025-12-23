@@ -207,10 +207,11 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 }
 
 /* INSTRUCTION */
-.help-btn{
-  width:44px;
-  padding:0;
-  font-size:20px;
+.instruction-btn{
+  padding:0 16px;
+  font-size:14px;
+  background:#ffd166;
+  color:#333;
 }
 
 /* START ROW GROUP */
@@ -349,7 +350,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   </label>
 
   <!-- 2. INSTRUCTION -->
-  <button class="bottom-btn help-btn" onclick="openHelp()">❓ INSTRUCTION</button>
+  <button class="bottom-btn instruction-btn" onclick="openHelp()">❓ INSTRUCTION</button>
 
   <!-- 3. TIMER -->
   <div class="bottom-btn timer-btn" id="timer">⏱️ 20</div>
@@ -580,6 +581,7 @@ function closeHelp(e){
 
 </body>
 </html>
+
 
 
 
