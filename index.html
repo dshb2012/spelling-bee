@@ -118,6 +118,10 @@ th:nth-child(2),td:nth-child(2){width:30%;}
 th:nth-child(3),td:nth-child(3){width:40%;}
 th:nth-child(4),td:nth-child(4){width:20%;}
 
+#tableHead{
+  display:none;
+}
+  
 /* ===== BOTTOM ===== */
 #bottom{
   position:fixed;
@@ -264,7 +268,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 <!-- TABLE -->
 <div class="wrapper">
 <table>
-<thead>
+<thead id="tableHead">
 <tr>
   <th>No.</th>
   <th>Word</th>
@@ -517,6 +521,7 @@ function closeHelp(e){
 
 </body>
 </html>
+
 
 
 
