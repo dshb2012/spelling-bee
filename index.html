@@ -226,6 +226,13 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   background:#ffd166;
   color:#333;
 }
+#instructionBtn,
+#timer{
+  display:none;
+}
+#bottomUpload{
+  display:none;
+}
 
 /* START ROW GROUP */
 .bottom-group{
@@ -332,22 +339,27 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 /* START MESSAGE */
 #startMessage{
   margin-top:180px;
-  margin-bottom:20px;
   text-align:center;
-  padding:20px;
+  padding:24px;
   background:#ffffff;
-  border-radius:20px;
-  box-shadow:0 6px 14px rgba(0,0,0,.12);
-  font-size:16px;
-  font-weight:800;
+  border-radius:24px;
+  box-shadow:0 8px 18px rgba(0,0,0,.15);
+  font-size:18px;
+  font-weight:900;
   color:#333;
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+#startMessage:hover{
+  transform:scale(1.03);
+  background:#f0fdf9;
 }
 
 #startMessage span{
   display:block;
-  margin-top:6px;
-  font-size:13px;
-  font-weight:600;
+  margin-top:8px;
+  font-size:14px;
   opacity:.6;
 }
   
@@ -356,6 +368,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 <body>
 <div class="app">
+<input type="file" id="fileInput" accept=".csv" style="display:none" onchange="loadCSV(event)">
 
 <!-- TOP -->
 <div id="top">
@@ -394,10 +407,10 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   
 <!-- TABLE -->
 <!-- START MESSAGE -->
-<div id="startMessage">
-  📂 <b>Upload a file</b> to start practice<br>
-  <span>Unggah dokumen untuk memulai latihan Spelling Bee</span>
-</div>
+<label id="startMessage" for="fileInput">
+  📂 <b>Upload a file</b> to start practice
+  <span>Unggah dokumen CSV untuk memulai latihan Spelling Bee</span>
+</label>
   
 <div class="wrapper">
 <table>
@@ -423,7 +436,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   </label>
 
   <!-- 2. INSTRUCTION -->
-  <button class="bottom-btn instruction-btn" onclick="openHelp()">❓ INSTRUCTION</button>
+  <button class="bottom-btn instruction-btn" id="instructionBtn" onclick="openHelp()">❓ INSTRUCTION</button>
 
   <!-- 3. TIMER -->
   <div class="bottom-btn timer-btn" id="timer">⏱️ 20</div>
@@ -553,6 +566,13 @@ function loadCSV(e){
 
     document.getElementById("startMessage").style.display = "none";
     
+    // TAMPILKAN UPLOAD BAWAH
+    document.getElementById("bottomUpload").style.display = "flex";
+
+    // TAMPILKAN TIMER & INSTRUCTION
+    document.getElementById("timer").style.display = "flex";
+    document.getElementById("instructionBtn").style.display = "flex";
+    
     // TAMPILKAN TOMBOL ATAS SETELAH UPLOAD
     document.getElementById("topBtns").classList.remove("hiddenTop");
 
@@ -675,6 +695,7 @@ document.addEventListener("click", function(e){
 
 </body>
 </html>
+
 
 
 
