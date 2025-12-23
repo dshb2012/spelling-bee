@@ -58,7 +58,7 @@ html,body{
   height:44px;
   border:none;
   border-radius:16px;
-  font-size:20px;
+  font-size:16px;
   letter-spacing:0.5px;
   font-weight:900;
   font-family:'Schoolbell', cursive;
@@ -66,42 +66,6 @@ html,body{
 .play{background:var(--primary);color:#fff;}
 .pause{background:var(--primary);color:#fff;}
 .stop{background:var(--primary);color:#fff;}
-
-#fileBox{
-  margin-top:8px;
-  display:flex;
-  justify-content:center;
-  gap:6px;
-}
-.fileBtn,.helpBtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height:34px;
-  padding:0 14px;
-  border-radius:14px;
-  background:var(--primary);
-  color:#fff;
-  font-weight:700;
-  font-size:13px;
-  cursor:pointer;
-  font-family:'Schoolbell', cursive;
-}
-.helpBtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height:34px;
-  padding:0 14px;
-  border-radius:14px;
-  background:var(--primary);
-  color:#fff;
-  font-weight:700;
-  font-size:13px;
-  cursor:pointer;
-  font-family:'Schoolbell', cursive;
-}
-.fileBtn input{display:none;}
 
 /* ===== TABLE ===== */
 .wrapper{
@@ -154,30 +118,80 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 /* ===== BOTTOM ===== */
 #bottom{
   position:fixed;
-  bottom:0;left:0;right:0;
-  background:var(--bg);
-  padding:12px;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#eef6f1;
+  padding:10px;
   display:flex;
   gap:8px;
   align-items:center;
   z-index:1000;
   box-shadow:0 -6px 12px rgba(0,0,0,.15);
 }
-#startRow{
-  width:60px;
-  height:36px;
-  border-radius:12px;
-  border:none;
-  text-align:center;
-  font-family:'Schoolbell', cursive;
-}
-#timer{
-  margin-left:auto;
-  background:#fff;
-  padding:10px 16px;
-  border-radius:14px;
+
+/* BUTTON UMUM */
+.bottom-btn{
+  height:44px;
+  padding:0 14px;
+  border-radius:18px;
+  background:#6c8cff;
+  color:white;
   font-weight:800;
-  font-family:'Schoolbell', cursive;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  white-space:nowrap;
+}
+
+/* UPLOAD */
+.upload-btn input{
+  display:none;
+}
+
+/* INSTRUCTION */
+.help-btn{
+  width:44px;
+  padding:0;
+  font-size:20px;
+}
+
+/* START ROW GROUP */
+.bottom-group{
+  display:flex;
+  align-items:center;
+  background:#5fb3a2;
+  border-radius:18px;
+  padding:4px 8px;
+  height:44px;
+  gap:6px;
+  color:white;
+  font-weight:800;
+}
+
+.bottom-group input{
+  width:50px;
+  border:none;
+  border-radius:10px;
+  text-align:center;
+  height:30px;
+}
+
+.bottom-group button{
+  border:none;
+  border-radius:10px;
+  background:#1e40af;
+  color:white;
+  font-weight:800;
+  padding:6px 10px;
+}
+
+/* TIMER */
+.timer-btn{
+  margin-left:auto;
+  background:#1e40af;
+  font-size:16px;
 }
 
 /* ===== POPUP ===== */
@@ -243,15 +257,6 @@ th:nth-child(4),td:nth-child(4){width:20%;}
     <button class="btn stop" onclick="stopAll()">⏹ stop</button>
   </div>
 
-  <div id="fileBox">
-    <label class="fileBtn">
-      📂 upload a file
-      <input type="file" accept=".csv" onchange="loadCSV(event)">
-    </label>
-    <div class="helpBtn" onclick="openHelp()">instruction</div>
-  </div>
-</div>
-
 <!-- TABLE -->
 <div class="wrapper">
 <table>
@@ -269,13 +274,27 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 <!-- BOTTOM -->
 <div id="bottom">
-  start from row : 
-  <input type="number" id="startRow" value="1" min="1">
-  <button class="btn play" onclick="playFromRow()">GO</button>
-  <div id="timer">⏱️ 20</div>
-</div>
+
+  <!-- 1. UPLOAD FILE -->
+  <label class="bottom-btn upload-btn">
+    📂 Upload File
+    <input type="file" accept=".csv" onchange="loadCSV(event)">
+  </label>
+
+  <!-- 2. INSTRUCTION -->
+  <button class="bottom-btn help-btn" onclick="openHelp()">❓</button>
+
+  <!-- 3. START ROW GROUP -->
+  <div class="bottom-group">
+    <input type="number" id="startRow" value="1" min="1">
+    <button onclick="playFromRow()">GO</button>
+  </div>
+
+  <!-- 4. TIMER -->
+  <div class="bottom-btn timer-btn" id="timer">20</div>
 
 </div>
+
 
 <!-- POPUP -->
 <div id="helpOverlay" onclick="closeHelp(event)">
@@ -494,6 +513,7 @@ function closeHelp(e){
 
 </body>
 </html>
+
 
 
 
