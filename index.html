@@ -7,14 +7,16 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poiret+One:wght@400;600;700&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Schoolbell&family=DM+Sans&display=swap" rel="stylesheet">
+
   
 <style>
 html,body{
   margin:0;padding:0;
   width:100%;
   overflow-x:hidden;
-  font-family:'Poiret One', system-ui,-apple-system,sans-serif;
+  font-family:'DM Sans', system-ui,-apple-system,sans-serif;
 }
 :root{
   --bg:#eef6f1;
@@ -38,12 +40,14 @@ html,body{
   text-align:center;
   font-size:30px;
   font-weight:900;
+  font-family:'Henny Penny', cursive;
 }
 #subtitle{
   text-align:center;
   font-size:14px;
   opacity:.5;
   margin-bottom:10px;
+  font-family:'DM Sans', cursive;
 }
 #topBtns{
   display:flex;
@@ -55,6 +59,7 @@ html,body{
   border:none;
   border-radius:16px;
   font-weight:900;
+  font-family:'Schoolbell', cursive;
 }
 .play{background:var(--primary);color:#fff;}
 .pause{background:var(--primary);color:#fff;}
@@ -78,6 +83,7 @@ html,body{
   font-weight:700;
   font-size:13px;
   cursor:pointer;
+  font-family:'Schoolbell', cursive;
 }
 .helpBtn{
   display:inline-flex;
@@ -91,6 +97,7 @@ html,body{
   font-weight:700;
   font-size:13px;
   cursor:pointer;
+  font-family:'Schoolbell', cursive;
 }
 .fileBtn input{display:none;}
 
@@ -116,11 +123,13 @@ tr.active td{background:#fff3bf;}
   font-size:16px;
   font-weight:800;
   white-space:nowrap;
+  font-family:'DM Sans', cursive;
 }
 .sentence{
   font-size:14px;
   line-height:1.5;
   overflow-wrap:break-word;
+  font-family:'DM Sans', cursive;
 }
 .spellBtn{
   background:var(--blue);
@@ -158,6 +167,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   border-radius:12px;
   border:none;
   text-align:center;
+  font-family:'DM Sans', cursive;
 }
 #timer{
   margin-left:auto;
@@ -165,6 +175,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   padding:10px 16px;
   border-radius:14px;
   font-weight:800;
+  font-family:'DM Sans', cursive;
 }
 
 /* ===== POPUP ===== */
@@ -184,6 +195,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   border-radius:20px;
   padding:20px;
   animation:pop .25s ease;
+  font-family:'DM Sans', cursive;
 }
 @keyframes pop{
   from{transform:scale(.9);opacity:0}
@@ -224,9 +236,9 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   </div>
 
   <div id="topBtns">
-    <button class="btn play" onclick="playAll()">▶ PLAY ALL</button>
-    <button class="btn pause" id="pauseBtn" onclick="pauseResume()">⏸ PAUSE</button>
-    <button class="btn stop" onclick="stopAll()">⏹ STOP</button>
+    <button class="btn play" onclick="playAll()">▶ play all</button>
+    <button class="btn pause" id="pauseBtn" onclick="pauseResume()">⏸ pause</button>
+    <button class="btn stop" onclick="stopAll()">⏹ stop</button>
   </div>
 
   <div id="fileBox">
@@ -480,6 +492,7 @@ function closeHelp(e){
 
 </body>
 </html>
+
 
 
 
