@@ -366,17 +366,19 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
   <div id="topBtns" class="hiddenTop">
 
-<button class="btn play">
+<button class="btn play" onclick="playAll()">
   <span class="icon">▶</span>
   <span class="text">PLAY ALL</span>
 </button>
 
-<button class="btn pause" id="pauseBtn">
+
+<button class="btn pause" id="pauseBtn" onclick="pauseResume()">
   <span class="icon">⏸</span>
   <span class="text">PAUSE</span>
 </button>
 
-<button class="btn stop">
+
+<button class="btn stop" onclick="stopAll()">
   <span class="icon">⏹</span>
   <span class="text">STOP</span>
 </button>
@@ -673,6 +675,7 @@ document.addEventListener("click", function(e){
 
 </body>
 </html>
+
 
 
 
