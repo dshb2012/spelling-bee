@@ -445,9 +445,9 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 <div id="bottom">
 
   <!-- 1. UPLOAD FILE -->
-  <label class="bottom-btn upload-btn" for="fileInput" id="bottomUpload">
-  📂 Upload File
-  </label>
+  <label class="bottom-btn upload-btn" id="bottomUpload" for="fileInput">
+  📂 Upload New File
+</label>
 
   <!-- 2. INSTRUCTION -->
   <button class="bottom-btn instruction-btn" id="instructionBtn" onclick="openHelp()">❓ INSTRUCTION</button>
@@ -571,6 +571,12 @@ function timer20(){
 
 /* CSV */
 function loadCSV(e){
+// 🔴 RESET DATA SEBELUM LOAD FILE BARU
+  stopAll();
+  rows = [];
+  current = 0;
+  tbody.innerHTML = "";
+  
   const r=new FileReader();
   r.onload=()=>{
     const lines=r.result.trim().split("\n").map(l=>l.split(","));
@@ -667,7 +673,7 @@ async function spell(i){
 function pauseResume(){
   paused=!paused;
   paused?speechSynthesis.pause():speechSynthesis.resume();
-  pauseBtn.textContent=paused?"▶ resume":"⏸ pause";
+  pauseBtn.textContent=paused?"▶ RESUME":"⏸ PAUSE";
 }
 function stopAll(){
   playing=false; paused=false;
@@ -713,6 +719,7 @@ document.addEventListener("click", function(e){
        onchange="loadCSV(event)">
 </body>
 </html>
+
 
 
 
