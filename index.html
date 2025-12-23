@@ -338,27 +338,40 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 /* START MESSAGE */
 #startMessage{
-  margin-top:180px;
-  text-align:center;
-  padding:24px;
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(238,246,241,0.95);
+  text-align: center;
+  padding: 24px;
+  cursor: pointer;
+}
+
+#startMessage .box{
   background:#ffffff;
   border-radius:24px;
-  box-shadow:0 8px 18px rgba(0,0,0,.15);
+  padding:32px 28px;
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
   font-size:18px;
   font-weight:900;
   color:#333;
-  cursor:pointer;
   transition:.25s ease;
 }
 
-#startMessage:hover{
-  transform:scale(1.03);
+#startMessage .box:hover{
+  transform:scale(1.05);
   background:#f0fdf9;
 }
 
 #startMessage span{
   display:block;
-  margin-top:8px;
+  margin-top:10px;
   font-size:14px;
   opacity:.6;
 }
@@ -407,8 +420,11 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 <!-- TABLE -->
 <!-- START MESSAGE -->
 <label id="startMessage" for="fileInput">
-  📂 <b>Upload a file</b> to start practice
-  <span>Unggah dokumen CSV untuk memulai latihan Spelling Bee</span>
+  <div class="box">
+    📂 <b>Upload a file</b><br>
+    to start practice
+    <span>Unggah dokumen CSV untuk memulai latihan Spelling Bee</span>
+  </div>
 </label>
   
 <div class="wrapper">
@@ -690,9 +706,14 @@ document.addEventListener("click", function(e){
 });
   
 </script>
-<input type="file" id="fileInput" accept=".csv" style="display:none" onchange="loadCSV(event)">
+<input type="file"
+       id="fileInput"
+       accept=".csv"
+       style="display:none"
+       onchange="loadCSV(event)">
 </body>
 </html>
+
 
 
 
