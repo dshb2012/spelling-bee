@@ -81,22 +81,20 @@ html,body{
 #topControls{
   margin-top:160px; /* jarak dari header bergambar */
   padding:14px;
-  background:#fbf6d6;   /* kuning muda */
   border-radius:24px;
   display:flex;
   gap:10px;
   align-items:center;
 }
 #topControls .btn{
-  height:50px;
+  height:30px;
   flex:1;                 /* semua sama besar */
   border-radius:18px;
-  background:#f9f4d2;     /* kuning pastel */
+  background:#white;     /* putih */
   color:#38b6ff;          /* biru */
   font-weight:900;
   font-size:14px;
-  box-shadow:0 4px 0 #e3d46a;
-}
+  }
   
 #topBtns{
   display:flex;
@@ -209,7 +207,7 @@ tr{
 }
 .spellBtn{
   background:var(--blue);
-  color:#fff;
+  color:#edf4dc;
   border:none;
   padding:6px 10px;
   border-radius:12px;
@@ -235,14 +233,13 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   bottom:0;
   left:0;
   right:0;
-  background:#eef6f1;
+  background:#edf4dc;
   padding:8px;
   display:flex;
   gap:6px;
   align-items:center;
   z-index:1000;
-  box-shadow:0 -6px 12px rgba(0,0,0,.15);
-}
+  }
 
 /* BUTTON UMUM */
 .bottom-btn{
@@ -250,15 +247,14 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   height:40px;
   padding:0 14px;
   border-radius:18px;
-  background:#edf4dc;
+  background:#f9f4d2;
   color:#38b6ff;
   font-weight:900;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:13px;
-  box-shadow:0 4 px 0 #cbe8a8;
-}
+  }
 
 /* UPLOAD */
 .upload-btn input{
@@ -270,7 +266,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   flex:1;
   padding:0 16px;
   font-size:13px;
-  background:#e1f2bb;
+  background:#f9f4d2;
   color:#38b6ff;
 }
 #instructionBtn,
@@ -285,7 +281,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 .bottom-group{
   display:flex;
   align-items:center;
-  background:#5fb3a2;
+  background:#edf4dc;
   border-radius:18px;
   padding:4px 8px;
   height:44px;
@@ -305,7 +301,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 .bottom-group button{
   border:none;
   border-radius:10px;
-  background:#1e40af;
+  background:#f9f4d2;
   color:white;
   font-weight:800;
   padding:6px 10px;
@@ -334,9 +330,10 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   z-index:2000;
 }
 #helpBox{
-  background:#fff;
+  background:#edf4dc;
+  color:#38b6ff;
   width:88%;
-  max-width:340px;
+  max-width:360px;
   max-height:75vh;
   overflow-y:auto;
   border-radius:20px;
@@ -349,11 +346,13 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   to{transform:scale(1);opacity:1}
 }
 #helpBox h3{
+  color:#38b6ff;
+  font-size:16px;
   margin:0 0 8px;
   text-align:center;
 }
 .helpItem{
-  background:#f4f6f8;
+  color:#38b6ff;
   border-radius:14px;
   padding:10px;
   margin-bottom:8px;
@@ -366,8 +365,8 @@ th:nth-child(4),td:nth-child(4){width:20%;}
   height:44px;
   border:none;
   border-radius:16px;
-  background:var(--primary);
-  color:#fff;
+  background:#e1f2bb;
+  color:white;
   font-weight:900;
   font-size:15px;
 }
@@ -834,6 +833,7 @@ document.addEventListener("click", function(e){
  
 </body>
 </html>
+
 
 
 
