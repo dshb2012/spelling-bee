@@ -345,22 +345,32 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 /* START MESSAGE */
 #startMessage{
-  max-width: 320px;
-  margin: 260px auto 0 auto; /* di bawah title */
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  z-index:1200;
+
+  width:85%;
+  max-width:360px;
+
   text-align:center;
-  padding:22px;
+  padding:26px;
   background:#ffffff;
-  border-radius:22px;
-  box-shadow:0 8px 18px rgba(0,0,0,.15);
+  border-radius:24px;
+  box-shadow:0 10px 22px rgba(0,0,0,.18);
+
   font-size:18px;
   font-weight:900;
   color:#333;
+
   cursor:pointer;
   transition:.25s ease;
 }
 
+
 #startMessage:hover{
-  transform:scale(1.03);
+  transform:translate(-50%, -50%) scale(1.03);
   background:#f0fdf9;
 }
 
@@ -773,8 +783,10 @@ document.addEventListener("click", function(e){
        accept=".csv"
        style="display:none"
        onchange="loadCSV(event)">
+ 
 </body>
 </html>
+
 
 
 
