@@ -121,7 +121,7 @@ html,body{
 }
 
 #topBtns .text{
-  font-size:13px;
+  font-size:12px;
   font-weight:900;
   line-height:1;
   }
@@ -144,7 +144,7 @@ html,body{
 }
 
 .top-group input{
-  width:20px;     /* nomor pages */
+  width:35px;     /* nomor pages */
   height:28px;
   border:none;
   border-radius:8px;
@@ -816,7 +816,7 @@ function pauseResume(){
 
   if(paused){
     speechSynthesis.pause();
-    icon.textContent = "▶";
+    icon.textContent = "❚❚▶";
     text.textContent = "RESUME";
   }else{
     speechSynthesis.resume();
@@ -873,6 +873,7 @@ document.addEventListener("click", function(e){
  
 </body>
 </html>
+
 
 
 
