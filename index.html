@@ -26,6 +26,7 @@ html,body{
   --warn:#ffd166;
   --danger:#ef476f;
   --blue:#6c8cff;
+  --btn-h; 44px;
 }
 .app{background:var(--bg);}
  
@@ -125,13 +126,13 @@ html,body{
 /* GROUP START ROW */
 .top-group{
   flex:1;
-  height:40px;
+  height:var(--btn-h);
   display:flex;
   align-items:center;
   gap:6px;
   border-radius:18px;
   background:#e1f2bb;
-  padding:6px;
+  padding:0 10px;
   border:2px solid #ffffff;
 }
 
@@ -144,7 +145,7 @@ html,body{
   font-size:13px;
 }
 .go-btn{
-  height:100%;
+  height:28px;
   padding:0 10px;
   border:2px solid #ffffff;
   border-radius:12px;
@@ -250,7 +251,6 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 /* BUTTON UMUM */
 .bottom-btn{
   flex:1;
-  height:40px;
   padding:0 14px;
   border-radius:18px;
   background:#f2e590;
@@ -315,7 +315,6 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 /* TIMER */
 .timer-btn{
-  height:40px;
   min-width:58px;
   padding:0 8px;
   flex:0.7;
@@ -327,7 +326,10 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 .bottom-btn,
 .timer-btn,
 .instruction-btn{
-  height:40px;
+  height:var(--btn-h);
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-size:13px;
   font-weight:900;
 }
@@ -846,6 +848,7 @@ document.addEventListener("click", function(e){
  
 </body>
 </html>
+
 
 
 
