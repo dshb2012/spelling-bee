@@ -105,13 +105,13 @@ html,body{
 
 /* PERKECIL BUTTON */
 #topBtns .btn{
+  height:var(--btn-h);
+  padding:0;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:2px;
-  padding:4px 0;
-  height:40px;
+  gap:4px;
   }
 
 #topBtns .icon{
@@ -120,8 +120,9 @@ html,body{
 }
 
 #topBtns .text{
-  font-size:11px;
-  font-weight:800;
+  font-size:13px;
+  font-weight:900;
+  line-height:1;
   }
 
 /* GROUP START ROW */
@@ -509,7 +510,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 <button class="btn play" onclick="playAll()">
   <span class="icon">▶</span>
-  <span class="text">PLAY ALL</span>
+  <span class="text">PLAY</span>
 </button>
 
 
@@ -822,7 +823,11 @@ function stopAll(){
   speechSynthesis.cancel();
   clearTimer();
   timer.textContent="⏱️ 20";
-  pauseBtn.textContent="⏸PAUSE";
+  
+  const icon = pauseBtn.querySelector(".icon");
+  const text = pauseBtn.querySelector(".text");
+  icon.textContent = "⏸";
+  text.textContent = "PAUSE";
 }
 
 /* POPUP */
@@ -862,6 +867,7 @@ document.addEventListener("click", function(e){
  
 </body>
 </html>
+
 
 
 
