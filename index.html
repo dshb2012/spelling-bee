@@ -316,7 +316,7 @@ th:nth-child(4),td:nth-child(4){width:20%;}
 
 /* TIMER */
 .timer-btn{
-  min-width:58px;
+  min-width:70px;
   padding:0 8px;
   flex:0.7;
   border:2px solid #ffffff;
@@ -802,9 +802,20 @@ async function spell(i){
 
 /* CONTROL */
 function pauseResume(){
-  paused=!paused;
-  paused?speechSynthesis.pause():speechSynthesis.resume();
-  pauseBtn.textContent=paused?"▶ RESUME":"⏸ PAUSE";
+  paused = !paused;
+
+  const icon = pauseBtn.querySelector(".icon");
+  const text = pauseBtn.querySelector(".text");
+
+  if(paused){
+    speechSynthesis.pause();
+    icon.textContent = "▶";
+    text.textContent = "RESUME";
+  }else{
+    speechSynthesis.resume();
+    icon.textContent = "⏸";
+    text.textContent = "PAUSE";
+  }
 }
 function stopAll(){
   playing=false; paused=false;
@@ -851,6 +862,7 @@ document.addEventListener("click", function(e){
  
 </body>
 </html>
+
 
 
 
