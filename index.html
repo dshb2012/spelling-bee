@@ -26,7 +26,7 @@ html,body{
   --warn:#ffd166;
   --danger:#ef476f;
   --blue:#6c8cff;
-  --btn-h; 44px;
+  --btn-h: 44px;
 }
 .app{background:var(--bg);}
  
@@ -115,13 +115,14 @@ html,body{
   }
 
 #topBtns .icon{
-  font-size:16px;
+  font-size:22px;
   line-height:1;
 }
 
 #topBtns .text{
   font-size:11px;
   font-weight:800;
+  display:none;
 }
 
 /* GROUP START ROW */
@@ -822,7 +823,7 @@ function stopAll(){
   speechSynthesis.cancel();
   clearTimer();
   timer.textContent="⏱️ 20";
-  pauseBtn.textContent="⏸ PAUSE";
+  pauseBtn.textContent="⏸";
 }
 
 /* POPUP */
@@ -862,6 +863,7 @@ document.addEventListener("click", function(e){
  
 </body>
 </html>
+
 
 
 
